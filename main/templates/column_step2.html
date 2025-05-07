@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Column Input - Step 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h2>Column Input - Step 2</h2>
+    <form method="post" id="columnForm">
+        {% for i in range(num_columns) %}
+        <fieldset style="margin-bottom:20px;">
+            <legend>Column {{ i+1 }}</legend>
+            <label>Length:</label>
+            <input type="number" name="length_{{i}}" step="any" required><br>
+            <label>Breadth:</label>
+            <input type="number" name="breadth_{{i}}" step="any" required><br>
+            <label>Depth:</label>
+            <input type="number" name="depth_{{i}}" step="any" required><br>
+            <label>Diameter:</label>
+            <input type="number" name="diameter_{{i}}" step="any" required><br>
+            <label>Steel Length:</label>
+            <input type="number" name="steel_length_{{i}}" step="any" required><br>
+            <label>Steel Count:</label>
+            <input type="number" name="steel_count_{{i}}" min="1" required><br>
+            <label>Select Grade:</label>
+            <select name="grade_{{i}}" class="gradeSelect" data-idx="{{i}}" required>
+                {% for grade in grades %}
+                    <option value="{{ grade }}">{{ grade }}</option>
+                {% endfor %}
+            </select><br>
+            <label>Specification:</label>
+            <select name="specification_{{i}}" class="specificationSelect" data-idx="{{i}}" required>
+                <!-- Options will be populated by JS -->
+            </select><br>
+            <input type="hidden" name="ecf_{{i}}" class="ecfInput" data-idx="{{i}}">
+        </fieldset>
+        {% endfor %}
+        <button type="submit">Show Result</button>
+    </form>
+    <script>
+    const specificationData = {
+        "M20": [
+            {"label": "full cement ecf= 0.11", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.11},
+            ],
+        "M25": [
+        {"label": "full cement ecf= 0.12", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.12},
+            {"label": "40% Cement Replacement - Fly Ash (ECF: 0.081)", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.081},
+            {"label": "35% natural pozzolanic ash (ECF: 0.087)", "value": "35% natural pozzolanic ash", "ecf": 0.087},
+            {"label": "15% Cement Replacement - Fly Ash (ECF: 0.103)", "value": "15% Cement Replacement - Fly Ash", "ecf": 0.103},
+            {"label": "30% Cement Replacement - Fly Ash (ECF: 0.091)", "value": "30% Cement Replacement - Fly Ash", "ecf": 0.091},
+            {"label": "25% Cement Replacement - Blast Furnace Slag (ECF: 0.088)", "value": "25% Cement Replacement - Blast Furnace Slag", "ecf": 0.088},
+            {"label": "50% Cement Replacement - Blast Furnace Slag (ECF: 0.065)", "value": "50% Cement Replacement - Blast Furnace Slag", "ecf": 0.065},
+            {"label": "70% Cement Replacement - Blast Furnace Slag (ECF: 0.053)", "value": "70% Cement Replacement - Blast Furnace Slag", "ecf": 0.053}
+        ],
+        "M30": [
+        {"label": "full cement ecf= 0.13", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.13},
+            {"label": "Portland Limestone Concrete - 14% Limestone (ECF: 0.102)", "value": "Portland Limestone Concrete - 14% Limestone", "ecf": 0.102},
+            {"label": "40% Cement Replacement - Fly Ash (ECF: 0.086)", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.086},
+            {"label": "35% natural pozzolanic ash (ECF: 0.092)", "value": "35% natural pozzolanic ash", "ecf": 0.092},
+            {"label": "15% Cement Replacement - Fly Ash (ECF: 0.109)", "value": "15% Cement Replacement - Fly Ash", "ecf": 0.109},
+            {"label": "30% Cement Replacement - Fly Ash (ECF: 0.097)", "value": "30% Cement Replacement - Fly Ash", "ecf": 0.097},
+            {"label": "25% Cement Replacement - Blast Furnace Slag (ECF: 0.094)", "value": "25% Cement Replacement - Blast Furnace Slag", "ecf": 0.094},
+            {"label": "50% Cement Replacement - Blast Furnace Slag (ECF: 0.069)", "value": "50% Cement Replacement - Blast Furnace Slag", "ecf": 0.069},
+            {"label": "70% Cement Replacement - Blast Furnace Slag (ECF: 0.056)", "value": "70% Cement Replacement - Blast Furnace Slag", "ecf": 0.056}
+        ],
+        "M35": [
+        {"label": "full cement ecf= 0.14", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.14},
+            {"label": "Portland Limestone Concrete - 14% Limestone (ECF: 0.108)", "value": "Portland Limestone Concrete - 14% Limestone", "ecf": 0.108},
+            {"label": "40% Cement Replacement - Fly Ash (ECF: 0.091)", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.091},
+            {"label": "35% natural pozzolanic ash (ECF: 0.098)", "value": "35% natural pozzolanic ash", "ecf": 0.098},
+            {"label": "15% Cement Replacement - Fly Ash (ECF: 0.116)", "value": "15% Cement Replacement - Fly Ash", "ecf": 0.116},
+            {"label": "30% Cement Replacement - Fly Ash (ECF: 0.104)", "value": "30% Cement Replacement - Fly Ash", "ecf": 0.104},
+            {"label": "25% Cement Replacement - Blast Furnace Slag (ECF: 0.101)", "value": "25% Cement Replacement - Blast Furnace Slag", "ecf": 0.101},
+            {"label": "50% Cement Replacement - Blast Furnace Slag (ECF: 0.075)", "value": "50% Cement Replacement - Blast Furnace Slag", "ecf": 0.075},
+            {"label": "70% Cement Replacement - Blast Furnace Slag (ECF: 0.059)", "value": "70% Cement Replacement - Blast Furnace Slag", "ecf": 0.059}
+        ],
+        "M40": [
+        {"label": "full cement ecf= 0.15", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.15},
+            {"label": "Portland Limestone Concrete - 14% Limestone (ECF: 0.119)", "value": "Portland Limestone Concrete - 14% Limestone", "ecf": 0.119},
+            {"label": "40% Cement Replacement - Fly Ash (ECF: 0.101)", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.101},
+            {"label": "35% natural pozzolanic ash (ECF: 0.108)", "value": "35% natural pozzolanic ash", "ecf": 0.108},
+            {"label": "15% Cement Replacement - Fly Ash (ECF: 0.128)", "value": "15% Cement Replacement - Fly Ash", "ecf": 0.128},
+            {"label": "30% Cement Replacement - Fly Ash (ECF: 0.116)", "value": "30% Cement Replacement - Fly Ash", "ecf": 0.116},
+            {"label": "25% Cement Replacement - Blast Furnace Slag (ECF: 0.113)", "value": "25% Cement Replacement - Blast Furnace Slag", "ecf": 0.113},
+            {"label": "50% Cement Replacement - Blast Furnace Slag (ECF: 0.085)", "value": "50% Cement Replacement - Blast Furnace Slag", "ecf": 0.085},
+            {"label": "70% Cement Replacement - Blast Furnace Slag (ECF: 0.064)", "value": "70% Cement Replacement - Blast Furnace Slag", "ecf": 0.064}
+        ],
+        "M45": [
+        {"label": "full cement ecf= 0.16", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.16},
+            {"label": "Portland Limestone Concrete - 14% Limestone (ECF: 0.130)", "value": "Portland Limestone Concrete - 14% Limestone", "ecf": 0.130},
+            {"label": "40% Cement Replacement - Fly Ash (ECF: 0.107)", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.107},
+            {"label": "35% natural pozzolanic ash (ECF: 0.115)", "value": "35% natural pozzolanic ash", "ecf": 0.115},
+            {"label": "15% Cement Replacement - Fly Ash (ECF: 0.137)", "value": "15% Cement Replacement - Fly Ash", "ecf": 0.137},
+            {"label": "30% Cement Replacement - Fly Ash (ECF: 0.123)", "value": "30% Cement Replacement - Fly Ash", "ecf": 0.123},
+            {"label": "25% Cement Replacement - Blast Furnace Slag (ECF: 0.121)", "value": "25% Cement Replacement - Blast Furnace Slag", "ecf": 0.121},
+            {"label": "50% Cement Replacement - Blast Furnace Slag (ECF: 0.092)", "value": "50% Cement Replacement - Blast Furnace Slag", "ecf": 0.092},
+            {"label": "70% Cement Replacement - Blast Furnace Slag (ECF: 0.068)", "value": "70% Cement Replacement - Blast Furnace Slag", "ecf": 0.068}
+        ],
+        "M50": [
+        {"label": "full cement ecf= 0.17", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.17},
+            {"label": "Portland Limestone Concrete - 14% Limestone (ECF: 0.141)", "value": "Portland Limestone Concrete - 14% Limestone", "ecf": 0.141},
+            {"label": "40% Cement Replacement - Fly Ash (ECF: 0.114)", "value": "40% Cement Replacement - Fly Ash", "ecf": 0.114},
+            {"label": "35% natural pozzolanic ash (ECF: 0.122)", "value": "35% natural pozzolanic ash", "ecf": 0.122},
+            {"label": "15% Cement Replacement - Fly Ash (ECF: 0.147)", "value": "15% Cement Replacement - Fly Ash", "ecf": 0.147},
+            {"label": "30% Cement Replacement - Fly Ash (ECF: 0.131)", "value": "30% Cement Replacement - Fly Ash", "ecf": 0.131},
+            {"label": "25% Cement Replacement - Blast Furnace Slag (ECF: 0.130)", "value": "25% Cement Replacement - Blast Furnace Slag", "ecf": 0.130},
+            {"label": "50% Cement Replacement - Blast Furnace Slag (ECF: 0.098)", "value": "50% Cement Replacement - Blast Furnace Slag", "ecf": 0.098},
+            {"label": "70% Cement Replacement - Blast Furnace Slag (ECF: 0.072)", "value": "70% Cement Replacement - Blast Furnace Slag", "ecf": 0.072}
+        ]
+    };
+    
+    function updateSpecificationOptions(idx) {
+        const gradeSelect = document.querySelector('.gradeSelect[data-idx="'+idx+'"]');
+        const specSelect = document.querySelector('.specificationSelect[data-idx="'+idx+'"]');
+        specSelect.innerHTML = "";
+        if (specificationData[gradeSelect.value]) {
+            specificationData[gradeSelect.value].forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                option.setAttribute('data-ecf', opt.ecf);
+                specSelect.appendChild(option);
+            });
+        }
+        updateECFInput(idx);
+    }
+    
+    function updateECFInput(idx) {
+        const specSelect = document.querySelector('.specificationSelect[data-idx="'+idx+'"]');
+        const ecfInput = document.querySelector('.ecfInput[data-idx="'+idx+'"]');
+        if (specSelect.selectedOptions.length > 0) {
+            ecfInput.value = specSelect.selectedOptions[0].getAttribute('data-ecf');
+        }
+    }
+    
+    document.querySelectorAll('.gradeSelect').forEach((gradeSelect) => {
+        gradeSelect.addEventListener('change', function() {
+            updateSpecificationOptions(this.getAttribute('data-idx'));
+        });
+    });
+    document.querySelectorAll('.specificationSelect').forEach((specSelect) => {
+        specSelect.addEventListener('change', function() {
+            updateECFInput(this.getAttribute('data-idx'));
+        });
+    });
+
+    // Initialize all selects on page load
+    window.onload = function() {
+        document.querySelectorAll('.gradeSelect').forEach((gradeSelect) => {
+            updateSpecificationOptions(gradeSelect.getAttribute('data-idx'));
+        });
+    };
+
+    // Ensure ECF is set before form submit
+    document.getElementById('columnForm').addEventListener('submit', function(e) {
+        document.querySelectorAll('.gradeSelect').forEach((gradeSelect) => {
+            updateECFInput(gradeSelect.getAttribute('data-idx'));
+        });
+    });
+    </script>
+</body>
+</html>

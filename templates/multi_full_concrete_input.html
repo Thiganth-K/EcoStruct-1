@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Full Concrete Input - ecostruct</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center">Full Concrete Input for {{ count }} Columns</h2>
+        <form method="POST" class="mx-auto" style="max-width:800px;">
+            {% for i in range(count) %}
+            <section class="mb-4 p-3 border rounded">
+                <h4 class="mb-3">Inputs for Column {{ i+1 }}</h4>
+                <div class="mb-3">
+                    <label for="col_{{i}}_length" class="form-label">Length</label>
+                    <input type="number" step="any" class="form-control" id="col_{{i}}_length" name="col_{{i}}_length" required>
+                </div>
+                <div class="mb-3">
+                    <label for="col_{{i}}_breadth" class="form-label">Breadth</label>
+                    <input type="number" step="any" class="form-control" id="col_{{i}}_breadth" name="col_{{i}}_breadth" required>
+                </div>
+                <div class="mb-3">
+                    <label for="col_{{i}}_height" class="form-label">Depth</label>
+                    <input type="number" step="any" class="form-control" id="col_{{i}}_height" name="col_{{i}}_height" required>
+                </div>
+                <div class="mb-3">
+                    <label for="col_{{i}}_diameter" class="form-label">Diameter</label>
+                    <input type="number" step="any" class="form-control" id="col_{{i}}_diameter" name="col_{{i}}_diameter" required>
+                </div>
+                <div class="mb-3">
+                    <label for="col_{{i}}_steel_length" class="form-label">Steel Length</label>
+                    <input type="number" step="any" class="form-control" id="col_{{i}}_steel_length" name="col_{{i}}_steel_length" required>
+                </div>
+                <div class="mb-3">
+                    <label for="col_{{i}}_count" class="form-label">Steel Count</label>
+                    <input type="number" step="1" class="form-control" id="col_{{i}}_count" name="col_{{i}}_count" required>
+                </div>
+                <div class="mb-3">
+                    <label for="col_{{i}}_grade" class="form-label">Select Grade</label>
+                    <select class="form-select" id="col_{{i}}_grade" name="col_{{i}}_grade" required onchange="updateMixOptions({{i}})">
+                        <option value="" disabled selected>Select a grade</option>
+                        <option value="RC25">RC 25 (20/25 MPa)</option>
+                        <option value="RC30">RC 30 (25/30 MPa)</option>
+                        <option value="RC35">RC 35 (28/35 MPa)</option>
+                        <option value="RC40">RC 40 (32/40 MPa)</option>
+                        <option value="RC45">RC 45 (32/40 MPa)</option>
+                        <option value="RC50">RC 50 (40/50 MPa)</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="col_{{i}}_mix_type_div" style="display:none;">
+                    <label for="col_{{i}}_mix_type" class="form-label">Select Mix Type</label>
+                    <select class="form-select" id="col_{{i}}_mix_type" name="col_{{i}}_mix_type" required onchange="updateOthersGrade({{i}})">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+                <div class="mb-3" id="col_{{i}}_others_grade_div" style="display:none;">
+                    <label for="col_{{i}}_others_grade" class="form-label">Select Standard Grade</label>
+                    <select class="form-select" id="col_{{i}}_others_grade" name="col_{{i}}_others_grade" onchange="setOthersECF({{i}})">
+                        <option value="" disabled selected>Select a standard grade</option>
+                        <option value="M20" data-ecf="0.11" data-ratio="1:1.5:3" data-cement="403.2" data-fine="672" data-coarse="1260">M20 (ECF: 0.11)</option>
+                        <option value="M25" data-ecf="0.12" data-ratio="1:1:2" data-cement="360" data-fine="679" data-coarse="1207">M25 (ECF: 0.12)</option>
+                        <option value="M30" data-ecf="0.13" data-ratio="1:0.75:1.5" data-cement="350" data-fine="711" data-coarse="1283">M30 (ECF: 0.13)</option>
+                        <option value="M35" data-ecf="0.14" data-ratio="1:0.5:1" data-cement="420" data-fine="750" data-coarse="1200">M35 (ECF: 0.14)</option>
+                        <option value="M40" data-ecf="0.15" data-ratio="1:0.25:0.5" data-cement="400" data-fine="660" data-coarse="1168">M40 (ECF: 0.15)</option>
+                        <option value="M45" data-ecf="0.16" data-ratio="1:3.19:4.06" data-cement="450" data-fine="685" data-coarse="1150">M45 (ECF: 0.16)</option>
+                        <option value="M50" data-ecf="0.17" data-ratio="1:2.28:3.12" data-cement="450" data-fine="750" data-coarse="1200">M50 (ECF: 0.17)</option>
+                    </select>
+                </div>
+                <script>
+                function setOthersECF(idx) {
+                    var select = document.getElementById('col_' + idx + '_others_grade');
+                    var selected = select.options[select.selectedIndex];
+                    var ecf = selected.getAttribute('data-ecf');
+                    var ratio = selected.getAttribute('data-ratio');
+                    var cement = selected.getAttribute('data-cement');
+                    var fine = selected.getAttribute('data-fine');
+                    var coarse = selected.getAttribute('data-coarse');
+                    document.getElementById('col_' + idx + '_ecf').textContent = ecf;
+                    document.getElementById('col_' + idx + '_ratio').textContent = ratio;
+                    document.getElementById('col_' + idx + '_cement').textContent = cement;
+                    document.getElementById('col_' + idx + '_fine').textContent = fine;
+                    document.getElementById('col_' + idx + '_coarse').textContent = coarse;
+                    document.getElementById('col_' + idx + '_ecf_input').value = ecf;
+                    document.getElementById('col_' + idx + '_ratio_input').value = ratio;
+                    document.getElementById('col_' + idx + '_cement_input').value = cement;
+                    document.getElementById('col_' + idx + '_fine_input').value = fine;
+                    document.getElementById('col_' + idx + '_coarse_input').value = coarse;
+                    document.getElementById('col_' + idx + '_grade-values').style.display = 'block';
+                }
+                function updateMixOptions(idx) {
+                    var grade = document.getElementById('col_' + idx + '_grade').value;
+                    var mixTypeDiv = document.getElementById('col_' + idx + '_mix_type_div');
+                    var mixTypeSelect = document.getElementById('col_' + idx + '_mix_type');
+                    var othersGradeDiv = document.getElementById('col_' + idx + '_others_grade_div');
+                    if (grade) {
+                        mixTypeDiv.style.display = 'block';
+                        othersGradeDiv.style.display = 'none';
+                        var options = [
+                            {text: "Portland Limestone Concrete - 14% Limestone", value: "plc_14"},
+                            {text: "35% natural pozzolanic ash", value: "pozzolanic_35"},
+                            {text: "15% Cement Replacement - Fly Ash", value: "flyash_15"},
+                            {text: "30% Cement Replacement - Fly Ash", value: "flyash_30"},
+                            {text: "40% Cement Replacement - Fly Ash", value: "flyash_40"},
+                            {text: "25% Cement Replacement - Blast Furnace Slag", value: "slag_25"},
+                            {text: "50% Cement Replacement - Blast Furnace Slag", value: "slag_50"},
+                            {text: "70% Cement Replacement - Blast Furnace Slag", value: "slag_70"},
+                            {text: "Others", value: "others"}
+                        ];
+                        mixTypeSelect.innerHTML = '<option value="" disabled selected>Select a mix type</option>';
+                        options.forEach(function(opt) {
+                            var option = document.createElement('option');
+                            option.value = opt.value;
+                            option.text = opt.text;
+                            mixTypeSelect.appendChild(option);
+                        });
+                    } else {
+                        mixTypeDiv.style.display = 'none';
+                        othersGradeDiv.style.display = 'none';
+                    }
+                }
+                function updateOthersGrade(idx) {
+                    var mixType = document.getElementById('col_' + idx + '_mix_type').value;
+                    var othersGradeDiv = document.getElementById('col_' + idx + '_others_grade_div');
+                    if (mixType === "others") {
+                        othersGradeDiv.style.display = 'block';
+                    } else {
+                        othersGradeDiv.style.display = 'none';
+                    }
+                }
+                </script>
+                <div id="col_{{i}}_grade-values" style="display:none;">
+                    <p>Ratio: <span id="col_{{i}}_ratio"></span></p>
+                    <p>Cement (Kg): <span id="col_{{i}}_cement"></span></p>
+                    <p>Fine Aggregate (Kg): <span id="col_{{i}}_fine"></span></p>
+                    <p>Coarse Aggregate (Kg): <span id="col_{{i}}_coarse"></span></p>
+                    <p>ECF: <span id="col_{{i}}_ecf"></span></p>
+                </div>
+                <input type="hidden" id="col_{{i}}_ratio_input" name="col_{{i}}_ratio">
+                <input type="hidden" id="col_{{i}}_cement_input" name="col_{{i}}_cement">
+                <input type="hidden" id="col_{{i}}_fine_input" name="col_{{i}}_fine">
+                <input type="hidden" id="col_{{i}}_coarse_input" name="col_{{i}}_coarse">
+                <input type="hidden" id="col_{{i}}_ecf_input" name="col_{{i}}_ecf">
+            </section>
+            {% endfor %}
+            <button type="submit" class="btn btn-success w-100">Submit</button>
+        </form>
+    </div>
+    <script>
+        function updateGradeValues(idx) {
+            var select = document.getElementById('col_' + idx + '_grade');
+            var selected = select.options[select.selectedIndex];
+            var ratio = selected.getAttribute('data-ratio');
+            var cement = selected.getAttribute('data-cement');
+            var fine = selected.getAttribute('data-fine');
+            var coarse = selected.getAttribute('data-coarse');
+            var ecf = selected.getAttribute('data-ecf');
+            if (ratio && cement && fine && coarse && ecf) {
+                document.getElementById('col_' + idx + '_grade-values').style.display = 'block';
+                document.getElementById('col_' + idx + '_ratio').textContent = ratio;
+                document.getElementById('col_' + idx + '_cement').textContent = cement;
+                document.getElementById('col_' + idx + '_fine').textContent = fine;
+                document.getElementById('col_' + idx + '_coarse').textContent = coarse;
+                document.getElementById('col_' + idx + '_ecf').textContent = ecf;
+                document.getElementById('col_' + idx + '_ratio_input').value = ratio;
+                document.getElementById('col_' + idx + '_cement_input').value = cement;
+                document.getElementById('col_' + idx + '_fine_input').value = fine;
+                document.getElementById('col_' + idx + '_coarse_input').value = coarse;
+                document.getElementById('col_' + idx + '_ecf_input').value = ecf;
+            } else {
+                document.getElementById('col_' + idx + '_grade-values').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

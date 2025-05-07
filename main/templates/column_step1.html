@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Column Input - Step 1</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h2>Column Input - Step 1</h2>
+    <form method="post">
+        <label>Enter the number of columns:</label>
+        <input type="number" name="num_columns" min="1" required>
+        <button type="submit">Next</button>
+    </form>
+</body>
+</html>

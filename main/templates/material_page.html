@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ material }} - Ecostruct</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h2>{{ material }}</h2>
+    <div class="icon-large icon-{{ material|lower }}"></div>
+    <p>You selected {{ material }}.</p>
+    <a href="/main_menu">Back to Menu</a>
+</body>
+</html>

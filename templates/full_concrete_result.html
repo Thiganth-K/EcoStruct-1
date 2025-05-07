@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Full Concrete Result - ecostruct</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5 text-center">
+        <h2>Full Concrete Calculation Result</h2>
+        <!-- Concrete Inputs -->
+        <section class="mb-4 p-3 border rounded">
+            <h4 class="mb-3">Concrete Inputs</h4>
+            <p>Length: <strong>{{ length }}</strong></p>
+            <p>Breadth: <strong>{{ breadth }}</strong></p>
+            <p>Depth: <strong>{{ height }}</strong></p>
+        </section>
+        <!-- Steel Inputs -->
+        <section class="mb-4 p-3 border rounded">
+            <h4 class="mb-3">Steel Inputs</h4>
+            <p>Diameter: <strong>{{ diameter }}</strong></p>
+            <p>Length: <strong>{{ steel_length }}</strong></p>
+            <p>Count: <strong>{{ count }}</strong></p>
+        </section>
+        <!-- Grade Selection -->
+        <section class="mb-4 p-3 border rounded">
+            <h4 class="mb-3">Grade Selection</h4>
+            <p>Grade: <strong>{{ grade }}</strong></p>
+            <p>Ratio: <strong>{{ ratio }}</strong></p>
+            <p>Cement (Kg/m³): <strong>{{ cement }}</strong></p>
+            <p>Fine Aggregate (Kg/m³): <strong>{{ fine }}</strong></p>
+            <p>Coarse Aggregate (Kg/m³): <strong>{{ coarse }}</strong></p>
+            <p>ECF: <strong>{{ ecf }}</strong></p>
+        </section>
+        <!-- Concrete Calculation -->
+        <section class="mb-4 p-3 border rounded">
+            <h4 class="mb-3">Concrete Calculation</h4>
+            <p>Volume: <strong>{{ volume }}</strong> m³</p>
+            <p>Total Cement (Kg): <strong>{{ cement }}</strong></p>
+            <p>Total Fine Aggregate (Kg): <strong>{{ fine }}</strong></p>
+            <p>Total Coarse Aggregate (Kg): <strong>{{ coarse }}</strong></p>
+            <p>Total Weight of Concrete (Kg): <strong>{{ total_weight }}</strong></p>
+        </section>
+        <!-- Steel Calculation -->
+        <section class="mb-4 p-3 border rounded">
+            <h4 class="mb-3">Steel Calculation</h4>
+            <p>Steel Weight (1 bar, kg): <strong>{{ steel_kg }}</strong></p>
+            <p>Total Steel Weight (kg): <strong>{{ applied_count_steel_kg }}</strong></p>
+        </section>
+        <!-- Concrete & Steel Calculation -->
+        <section class="mb-4 p-3 border rounded">
+            <h4 class="mb-3">Concrete & Steel Calculation</h4>
+            <p>Total Weight (Concrete + Steel, kg): <strong>{{ weight_of_steel_concrete }}</strong></p>
+            <p>Emitted Carbon (kg CO₂): <strong>{{ emitted_carbon }}</strong></p>
+        </section>
+        <a href="{{ url_for('full_concrete_input') }}" class="btn btn-success mt-4">Back</a>
+    </div>
+</body>
+</html>

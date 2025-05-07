@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result - Ecostruct</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <h2 class="mb-4 text-success"><i class="bi bi-bar-chart-line"></i> Calculation Result</h2>
+        <div class="row">
+        {% for col in columns %}
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm result-card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Column {{ loop.index }}</h5>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Length:</strong> {{ col.length }}</li>
+                        <li class="list-group-item"><strong>Breadth:</strong> {{ col.breadth }}</li>
+                        <li class="list-group-item"><strong>Depth:</strong> {{ col.depth }}</li>
+                        <li class="list-group-item"><strong>Diameter:</strong> {{ col.diameter }}</li>
+                        <li class="list-group-item"><strong>Steel Length:</strong> {{ col.steel_length }}</li>
+                        <li class="list-group-item"><strong>Steel Count:</strong> {{ col.steel_count }}</li>
+                        <li class="list-group-item"><strong>Grade:</strong> {{ col.grade }}</li>
+                        <li class="list-group-item"><strong>Specification:</strong> {{ col.specification }}</li>
+                        <li class="list-group-item"><strong>ECF:</strong> {{ col.ecf }}</li>
+                        <li class="list-group-item"><strong>Volume:</strong> {{ col.volume }}</li>
+                        <li class="list-group-item"><strong>Cement (kg):</strong> {{ col.cement }}</li>
+                        <li class="list-group-item"><strong>Fine Aggregate (kg):</strong> {{ col.fine }}</li>
+                        <li class="list-group-item"><strong>Coarse Aggregate (kg):</strong> {{ col.coarse }}</li>
+                        <li class="list-group-item"><strong>Concrete Weight (kg):</strong> {{ col.concrete_weight }}</li>
+                        <li class="list-group-item"><strong>Steel Weight (kg, one bar):</strong> {{ col.steel_kg }}</li>
+                        <li class="list-group-item"><strong>Total Steel Weight (kg):</strong> {{ col.applied_count_steel_kg }}</li>
+                        <li class="list-group-item"><strong>Total Weight (Concrete + Steel):</strong> {{ col.weight_of_steel_concrete }}</li>
+                        <li class="list-group-item"><strong>Emitted Carbon (kg):</strong> {{ col.emitted_carbon }}</li>
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+        <div class="card result-summary shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Total for {{ num_columns }} Columns</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Total Weight (Concrete + Steel):</strong> {{ total_weight_of_steel_concrete }}</li>
+                <li class="list-group-item"><strong>Total Emitted Carbon (kg):</strong> {{ total_emitted_carbon }}</li>
+            </ul>
+            <div class="card-body">
+                <button class="btn btn-success mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#transportForm" aria-expanded="false" aria-controls="transportForm">
+                    <i class="bi bi-truck"></i> Calculate Transportation Factor
+                </button>
+                <div class="collapse" id="transportForm">
+                    <form id="transportationForm" class="mb-3">
+                        <div class="mb-2">
+                            <label for="vehicle" class="form-label">Type of Vehicle</label>
+                            <select class="form-select" id="vehicle" name="vehicle" required>
+                                <option value="HGV">HGV (7.5 ton - 17 ton)</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label for="distance" class="form-label">Distance (km)</label>
+                            <input type="number" class="form-control" id="distance" name="distance" min="1" required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="fuel" class="form-label">Type of Fuel</label>
+                            <select class="form-select" id="fuel" name="fuel" required>
+                                <option value="petrol">Petrol</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="calculateTransport()">
+                            <i class="bi bi-calculator"></i> Calculate Transport ECF
+                        </button>
+                    </form>
+                    <div id="transportResult" class="alert alert-info d-none"></div>
+                    <button id="wasteBtn" class="btn btn-warning mt-2 d-none" type="button" onclick="calculateWaste()">
+                        <i class="bi bi-recycle"></i> Calculate Waste Factor
+                    </button>
+                    <div id="wasteResult" class="alert alert-warning mt-2 d-none"></div>
+                </div>
+            </div>
+        </div>
+        <a href="/main_menu" class="btn btn-outline-secondary mt-4"><i class="bi bi-arrow-left"></i> Back to Menu</a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    let total_weight = {{ total_weight_of_steel_concrete|float }};
+    let emitted_carbon = {{ total_emitted_carbon|float }};
+    let transport_ecf = 0;
+
+    function calculateTransport() {
+        const distance = parseFloat(document.getElementById('distance').value);
+        if (isNaN(distance) || distance <= 0) {
+            document.getElementById('transportResult').classList.remove('d-none');
+            document.getElementById('transportResult').classList.add('alert-danger');
+            document.getElementById('transportResult').innerHTML = "Please enter a valid distance.";
+            return;
+        }
+        let ecf_petrol = 0.615;
+        transport_ecf = (total_weight * distance * ecf_petrol) / 1000;
+        const resultDiv = document.getElementById('transportResult');
+        resultDiv.classList.remove('d-none', 'alert-danger');
+        resultDiv.classList.add('alert-info');
+        resultDiv.innerHTML = `<strong>ECF for Transport:</strong> ${transport_ecf.toFixed(3)} kg CO₂e`;
+        document.getElementById('wasteBtn').classList.remove('d-none');
+    }
+
+    function calculateWaste() {
+        let waste_factor = 0.05 * (emitted_carbon + transport_ecf + 0.02);
+        let emboided_carbon_waste = total_weight * waste_factor;
+        let all_emboided_carbon = emitted_carbon + transport_ecf + emboided_carbon_waste;
+        const wasteDiv = document.getElementById('wasteResult');
+        wasteDiv.classList.remove('d-none');
+        wasteDiv.innerHTML = `
+            <strong>Waste Factor:</strong> ${waste_factor.toFixed(5)}<br>
+            <strong>Emboided carbon emitted with waste factor:</strong> ${emboided_carbon_waste.toFixed(3)} kg CO₂e<br>
+            <strong>ALL Emboided carbon emitted:</strong> ${all_emboided_carbon.toFixed(3)} kg CO₂e
+        `;
+    }
+    </script>
+</body>
+</html>
