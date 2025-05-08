@@ -17,9 +17,10 @@
                         <h5 class="mb-0">Column {{ loop.index }}</h5>
                     </div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><strong>Length:</strong> {{ col.length }}</li>
+                        <li class="list-group-item"><strong>Width:</strong> {{ col.width }}</li>
                         <li class="list-group-item"><strong>Breadth:</strong> {{ col.breadth }}</li>
                         <li class="list-group-item"><strong>Depth:</strong> {{ col.depth }}</li>
+                        <li class="list-group-item"><strong>Column Count:</strong> {{ col.column_count }}</li>
                         <li class="list-group-item"><strong>Diameter:</strong> {{ col.diameter }}</li>
                         <li class="list-group-item"><strong>Steel Length:</strong> {{ col.steel_length }}</li>
                         <li class="list-group-item"><strong>Steel Count:</strong> {{ col.steel_count }}</li>
@@ -35,6 +36,7 @@
                         <li class="list-group-item"><strong>Total Steel Weight (kg):</strong> {{ col.applied_count_steel_kg }}</li>
                         <li class="list-group-item"><strong>Total Weight (Concrete + Steel):</strong> {{ col.weight_of_steel_concrete }}</li>
                         <li class="list-group-item"><strong>Emitted Carbon (kg):</strong> {{ col.emitted_carbon }}</li>
+                        <li class="list-group-item"><strong>Efficiency:</strong> {{ col.efficiency }}%</li>
                     </ul>
                 </div>
             </div>

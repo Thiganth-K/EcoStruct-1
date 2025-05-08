@@ -46,9 +46,10 @@ def column_step2():
         columns = []
         for i in range(num_columns):
             columns.append({
-                "length": float(request.form[f'length_{i}']),
+                "width": float(request.form[f'width_{i}']),
                 "breadth": float(request.form[f'breadth_{i}']),
                 "depth": float(request.form[f'depth_{i}']),
+                "column_count": int(request.form[f'column_count_{i}']),
                 "diameter": float(request.form[f'diameter_{i}']),
                 "steel_length": float(request.form[f'steel_length_{i}']),
                 "steel_count": int(request.form[f'steel_count_{i}']),
@@ -71,15 +72,19 @@ def result():
     total_weight_of_steel_concrete = 0
     total_emitted_carbon = 0
 
+    # For efficiency calculation
+    emissions_per_unit = []
+
     for col in columns_input:
         grade_data = GRADE_DATA.get(col['grade'], {})
         cement_per_m3 = grade_data.get('cement', 0)
         fine_per_m3 = grade_data.get('fine_agg', 0)
         coarse_per_m3 = grade_data.get('coarse_agg', 0)
         ecf = col['ecf']
+        count = col.get('column_count', 1)
 
         # Volume
-        volume = col['length'] * col['breadth'] * col['depth']
+        volume = col['width'] * col['breadth'] * col['depth']
 
         # Material Quantities
         cement = cement_per_m3 * volume
@@ -94,30 +99,54 @@ def result():
         applied_count_steel_kg = steel_kg * col['steel_count']
 
         # Total Weight (Concrete + Steel)
-        weight_of_steel_concrete = concrete_weight + applied_count_steel_kg
+        weight_of_steel_concrete = (concrete_weight + applied_count_steel_kg) * count
 
         # Emitted Carbon
-        emitted_carbon = weight_of_steel_concrete * ecf
+        emitted_carbon = (concrete_weight + applied_count_steel_kg) * ecf * count
 
         total_weight_of_steel_concrete += weight_of_steel_concrete
         total_emitted_carbon += emitted_carbon
 
+        emissions_per_unit.append({
+            "emitted_carbon": emitted_carbon,
+            "weight": weight_of_steel_concrete,
+            "volume": volume * count
+        })
+
         columns.append({
             **col,
-            "volume": volume,
-            "cement": cement,
-            "fine": fine,
-            "coarse": coarse,
-            "concrete_weight": concrete_weight,
+            "volume": volume * count,
+            "cement": cement * count,
+            "fine": fine * count,
+            "coarse": coarse * count,
+            "concrete_weight": concrete_weight * count,
             "steel_kg": steel_kg,
-            "applied_count_steel_kg": applied_count_steel_kg,
+            "applied_count_steel_kg": applied_count_steel_kg * count,
             "weight_of_steel_concrete": weight_of_steel_concrete,
             "emitted_carbon": emitted_carbon
         })
 
-    return render_template('result.html', columns=columns, num_columns=len(columns),
-                           total_weight_of_steel_concrete=total_weight_of_steel_concrete,
-                           total_emitted_carbon=total_emitted_carbon)
+    # Efficiency calculation (lowest emission per unit weight)
+    min_emission_per_weight = min(
+        (e["emitted_carbon"] / e["weight"]) if e["weight"] > 0 else float('inf')
+        for e in emissions_per_unit
+    ) if emissions_per_unit else 1
+
+    for idx, col in enumerate(columns):
+        emission_per_weight = (
+            col["emitted_carbon"] / col["weight_of_steel_concrete"]
+            if col["weight_of_steel_concrete"] > 0 else 0
+        )
+        efficiency = (min_emission_per_weight / emission_per_weight) * 100 if emission_per_weight > 0 else 0
+        columns[idx]["efficiency"] = round(efficiency, 1)
+
+    return render_template(
+        'result.html',
+        columns=columns,
+        num_columns=len(columns_input),
+        total_weight_of_steel_concrete=total_weight_of_steel_concrete,
+        total_emitted_carbon=total_emitted_carbon
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

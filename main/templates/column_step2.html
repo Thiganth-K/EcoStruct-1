@@ -10,12 +10,14 @@
         {% for i in range(num_columns) %}
         <fieldset style="margin-bottom:20px;">
             <legend>Column {{ i+1 }}</legend>
-            <label>Length:</label>
-            <input type="number" name="length_{{i}}" step="any" required><br>
+            <label>Width:</label>
+            <input type="number" name="width_{{i}}" step="any" required><br>
             <label>Breadth:</label>
             <input type="number" name="breadth_{{i}}" step="any" required><br>
             <label>Depth:</label>
             <input type="number" name="depth_{{i}}" step="any" required><br>
+            <label>Column Count:</label>
+            <input type="number" name="column_count_{{i}}" min="1" step="1" required><br>
             <label>Diameter:</label>
             <input type="number" name="diameter_{{i}}" step="any" required><br>
             <label>Steel Length:</label>
